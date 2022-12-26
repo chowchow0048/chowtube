@@ -1,0 +1,20 @@
+<setup>
+1. npm init
+
+2. "scripts" in package.json, npm run "script"
+    "scripts": "something" >> npm run something >> something에 할당된 script 실행
+    npm i : npm install
+
+3. npm i : npm은 package.json의 "dependencies"를 보고 package를 그에 맞게 알아서 install해준다
+    package-lock.json은 프로젝트 실행에 필요한 package들을 상세하게 기록해놈, version, resloved, integrity등등
+    다른사람에게 프로젝트를 전달해 줄 때, package.json, package-lock.json, index.js(프로젝트 실행 파일)을 보내주고 npm i를 실행하면
+    받은사람은 나와 같은 버전의 프로젝트를 실행할 수 있게됨
+
+4. babel: nodejs가 알아듣게 최신버전의 JS로 번역해주는 패키지
+    devDependencies: 개발자에게 필요한 패키지
+    preset: babel을 위한 아주 큰 플러그인
+    @babel/preset-env: smart preset, 최신 JS구문을 사용할 수 있게 해줌
+    babel 설정: babel.config.json
+
+5. babel 실행: babel-node index.js
+    nodemon: nodemon --exec ~
