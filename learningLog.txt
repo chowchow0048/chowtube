@@ -18,3 +18,105 @@
 
 5. babel 실행: babel-node index.js
     nodemon: nodemon --exec ~
+
+<introduction to Express>
+1. const app = express(); : express 객체 생성
+    app.request(port#, callFunction); : express를 통해 서버로 요청보냄
+
+2. const PORT = 4000; : 상수 PORT 4000
+    console.log(`server listening on port http://localhost:${PORT}`); : 백틱(₩) 쓰면 포멧지정 출력 가능, ${변수 or 상수}
+    / == root page, root server등등 메인이자 첫번째 웹페이지
+    http GET : get me this page
+    app.get(URL, function); : URL에 request가 있을 때 실행할 function을 정해서 실행
+
+3. app.get()의 함수들, req, res 객체
+
+    const handleLogin = (req, res) => {
+        return res.send("Login here.);
+    }
+    const handleHome = (req, res) => {
+        return res.send("I LOVE YOU");
+    }
+
+4. 백엔드 개발자: 서버의 request에 대답해준다 response 해준다.
+
+5. middleware = software in the middle
+    middleware는 req, res와 next라는 매개변수를 갖는 controller
+    next()는 middleware다음의 함수를 부른다
+    middleware는 필요한 만큼 만들 수 있음
+    middleware는 .use를 통해 모든 url에 쓰일수도, 하나의 url에만 사용될 수도 있음
+
+6. app.use() : ()안에 있는 함수를 서버가 켜졌을 때 실행, 순서에 따라 실행이 안 될 수도있으므로 순서가 중요
+    path(route, url) - middleware - finalware 순으로 실행
+
+7. recap - setup
+    npm: directory에 package.json이 있는상태에서 npm i 를 돌리면 dependencies에 맞게 package를 받아줌
+    babel: ES6의 최신 코드로 JS 파일을 변환시켜서 node가 ES6로 이해하게 하는 package
+    nodemon: 서버 끌 필요없이 변화하는대로 반영
+
+8. recap - servers
+    server : 항상 켜져있고 인터넷에 연결되어있으면서 request를 listening하는 컴퓨터
+    app = express()
+    app.listen(PORT, controller)
+    app.get(URL, ...controller)
+    app.use(middleware)
+    controller = (req, res) => {function}
+    middleware = (req, res, next) => {function, next()}
+
+9. recap - controllers
+10. recap - middleware
+
+11. external middleware
+    morgan: middleware package
+    morgan("dev"): method, URL, status code, 걸린시간 표기
+    "dev", "tiny", "combined", "common", "short" 등등 많은 표기방식이 있음
+
+<Routers>
+1. 2 domains, users and videos
+
+2. express.Router()를 통해 router 설정
+    globalRouter = express.Router()
+    userRouter = express.Router()
+    videoRouter = express.Router()
+    
+    Router설정 후, app.use()를 통해 URL과 router를 이어준다
+    app.use("/", globalRouter);
+    app.use("/users", userRouter);
+    app.use("/videos", videoRouter);
+
+    이후에 각 라우터 마다 하위 패스에 대한 라우팅 설정
+    globalRouter.get("/", handleHome);
+    userRouter.get("/edit", handleEdit); >> /users/edit 에 들어가면 handleEdit을 실행
+    videoRouter.get("/watch", handleWatch); >> /videos/watch 에 들어가면 handleWatch를 실행
+    
+    이번 강의의 키는 세부패스에 대한 설정을 한 적이 없다는거임
+    /users/edit에 대한 설정을 한 적은 없지만 userRouter -> /edit의 경로를 통해 함수실행이 이어짐
+
+3. Cleaning the code
+    Divide and Conquer
+    모든 파일은 하나의 모듈이다
+    모든 파일은 독립적이다
+    한 파일안에서도 돌아가는 환경을 코드로 만들어야한다
+
+    export default globalRouter;
+    export default userRouter;
+    export default videoRouter;
+
+    import globalRouter from '../routers/globalRouter'
+    import userRouter from '../routers/userRouter'
+    import videoRouter from '../routers/videoRouter'
+
+4. export vs export default
+    export default
+        - import할 때 객체의 이름을 변경할 수 있음
+        - 하나의 객체만 export 가능
+    export
+        - import할 때 객체의 이름을 변경할 수 없음
+        - 다수의 객체를 export 가능
+
+5. Recap - router
+
+6. Recap - architecture
+
+7. Planning Routers
+    more specificated routing paths(URLs)
