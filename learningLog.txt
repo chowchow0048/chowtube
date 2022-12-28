@@ -120,3 +120,21 @@
 
 7. Planning Routers
     more specificated routing paths(URLs)
+
+8. URL parameters 1
+    /: >> URL에 parameter(매개변수)를 넣는 기호, /: 이후에 / 전까지의
+    텍스트를 변수로 사용할 수 있음
+    코드로 어떻게 사용? >> req.params.~, ~ 부분은 id, potato 등등 변수같이
+    사용자가 지정한 parameter이름을 써줘야함
+    * 만약 '/:~' path를 parameter가 없는 다른 path보다 위에 넣으면
+      다른 원래 존재하는 path들은 지정한 path name이 parameter로 쓰일 수 있음
+      >> '/:~' path는 가장 밑에 몰아넣는다, 충돌이 일어나지 않게끔
+
+9. URL parameters 2
+    regular expression: 정규 표현식
+        1. /ab?cd : acd or abcd, 선택적 표현
+        2. /ab*cd : abasdfracd or ab123cd, 중간에 무한 표현
+        3. /ab+cd : abcd or abbcd or abbbcd ... , 선택적 무한 표현(최소1)
+        4. /ab(cd)?e : abe or abcde, 집단 선택적 표현
+        
+    
