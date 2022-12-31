@@ -136,5 +136,96 @@
         2. /ab*cd : abasdfracd or ab123cd, 중간에 무한 표현
         3. /ab+cd : abcd or abbcd or abbbcd ... , 선택적 무한 표현(최소1)
         4. /ab(cd)?e : abe or abcde, 집단 선택적 표현
-        
+
+<Templates>
+1. Returning HTML
+    res.send("<!DOCTYPE html> ~~~") 이렇게 HTML을 보낼 수 있음
+    근데 이건 너무 불편함, 긴급상황에서만 쓸모있음
+    그래서 우리는 pug가 필요함
+
+2. Configuring  pug
+    pug: template engine
+    step 1. install pug
+    step 2. set view engine as pug
+    step 3. make pug files
+
+    app.set("view engine", "pug") >> view engine을 pug로 set
+    views 폴더에 home.pug 생성
+    res.render("home") >> res.render는 첫번째 스트링을 views폴더에서
+    찾아서 리턴함
+
+    process.cwd() == current working directory, 현재 작업 영역
+    은 서버를 기동하는 파일의 위치에 따라 결정된다, 어디서 노드를 부르고 있는지에 따라 결정된다
+    package.json이 node.js를 실행하고 있음
+    app.set("views", process.cwd() + "/src/views"); >> views 경로 설정
+
+    pug: html인데 태그에 <>를 안씌우고 대충 띄어쓰기로 대체하는듯
+
+3. Partials
+    pug로 만든 html template들은 이것저것 활용할 수 있는게 많음
+    partials: 코드의 반복을 줄이기 위해 특정 부분을 따로 작은template을 만들어둬서 다른 template에 결합시킨다
+
+4. Extending Templates
+    partial는 작은 template을 만들어서 부품같이 사용하는거였지만 
+    extend, 즉 상속 기능을 사용하면 좀 더 많은 부분의 재사용을 줄일 수 있음
+    extends ~~.pug 이런식으로 사용함 >> html의 base template을 가질 수 있게하는 중요한 기능!
+
+    extend한 파일은 block을 통해 개별적인 content를 가질 수 있다
+    base 파일에 block부분은 extend받은 파일마다 개별적인 content로 설정할 수 있음
+
+5. Variables to Templates
+    html에 JavaScript 변수 넣기 >> #{변수이름}
+    html template에 있는 JS변수는 어디로 부터 값을 받을까? >> controller로 부터
+    home에 경우, videoController의 trending() 으로부터 render되므로
+    res.render("home", {변수이름: 넣을 값}); >> 이런 식으로, 마치 dictionary 자료형에서 "name": "value" 이렇게 넣어주듯이 넣어줌
+
+6. Recap
+
+7. MVP Styles
+    MVP.css 라는 간단한 css적용
+    head 밑에 <link rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css"> 여기서 
+    link(rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css") 꺽쇠 떼고 ()붙여주면 댐
+
+8. Conditionals
+    h1=pageTitle 이거랑
+    h1 #{pageTitle} 이거랑 같은데 Nico는 위에걸 선호한다캄, 왜냐?
+    #{} 이거는 다른 text랑 변수랑 구분짓기 위해서 써주는거고, 변수하나만
+    달랑 있는애들은 h1=변수 이렇게 쓰는게 맞다캄, 근데 나는 혼동올거같아서
+    한 방법만 쓰고싶은딩..
+
+    body
+        header
+            nav
+                ul
+                    li
+                        a(href="/login") Login
     
+    conditionals: if/else if/else
+    pug를 통해 html에서도 조건문을 쓸 수있음
+    예시, fakeUser라는 구조체를 JS로 부터 받고,fakeUser의 멤버를 통해 html 조건문 실행
+    const fakeUser = {
+        userName: "Tom",
+        loggedIn: false,
+    };
+
+    const home = (req, res) => res.render("home", {pageTitle: "home", fakeUser});
+
+    head
+    body
+        header
+            if fakeUser.loggedIn
+                small Hello #{fakeUser.userName}
+            nav
+                ul
+                    if fakeUser.loggedIn
+                        li
+                            a(href="/logout") Log out
+                    else
+                        li 
+                            a(href="/login") Log in
+
+9. Iteration
+
+10. Mixins
+
+11. Recap

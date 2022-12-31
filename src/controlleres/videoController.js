@@ -1,15 +1,20 @@
-export const trending = (req, res) => res.send("Home Page Videos");
-export const see = (req, res) => {
-    console.log(req.params);
-    res.send(`Watch video ${req.params.potato}`);
-}
-export const edit = (req, res) =>{
-    console.log(req.params);
-    res.send(`Edit video ${req.params.id}`);
-} 
+const fakeUser = {
+    username: "Tom",
+    loggedIn: true,
+};
+
+export const trending = (req, res) => 
+    res.render("home", {pageTitle: "Home", fakeUser: fakeUser});
+
+export const watch = (req, res) => res.render("watch", {pageTitle: "Watch"});
+
+export const edit = (req, res) => res.render("edit", {pageTitle: "Edit"});
+
 export const search = (req, res) => res.send("Search");
+
 export const upload = (req, res) => res.send("Upload Video");
+
 export const deleteVideo = (req, res) => {
     console.log(req.params);
     res.send(`Delete Video ${req.params.id}`);
-}
+} 
