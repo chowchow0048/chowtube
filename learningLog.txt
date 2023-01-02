@@ -225,7 +225,64 @@
                             a(href="/login") Log in
 
 9. Iteration
+    pug에서 iteration(반복문) 사용가능
+    controller에서 view template에게 array형태의 자료를 넘겨주면
+    template에서 그걸 반복문으로 사용할 수 있다
+
+    const videos = [1, 2, 3, 4, 5];
+    res.render('home', {videos});
+     이런식으로 array만들어서 넘겨주면
+
+    block content
+        ul
+            each video in videos
+                li=video
+    이렇게 하면 videos의 원소들을 li로 갖는 ul이 생성됨
+
+    each video in videos
+        li=video
+    else
+        li There is no content
+    반복문은 조건문이랑도 같이 쓸 수 있다
+    만약 넘겨준 videos array가 비어있으면 else로 넘어가서
+    There is no content라는 li가 화면에 나타날거임
 
 10. Mixins
+    mixin은 좀 똑똑한 partial이다
+    mixin은 partial처럼 한 template의 부분으로 결합되어 작동하지만
+    변수를 받아서 사용할 수 있고, 반복문과 결합해서 사용할 수 있기 때문에
+    좀 더 다양한 표현을 가능하게 한다
+
+    1.mixins 폴더를 만들고 
+    2.mixin 파일을 만들고
+    3.mixin 파일 안에 실행할 로직을 만들어주고
+    4.mixin 로직을 사용할 template에 설치를 해주면 됨
+
+    1.mixins/video.pug 생성
+    2 and 3.
+        mixin video(info) 
+            div
+                h4=info.title
+                ul
+                    li #{info.asasdf}~~
+                    li #{info.asgasrn}~~
+                    ~~~~
+    대략적인 mixin 파일의 생김새는 이렇다
+    mixin 이름(인자 이름)
+        로직
+    
+    4. 설치
+    include mixins/video
+
+    each info in videos
+        +video(info)
+
+    include mixins/mixin파일이름
+    +mixin이름(인자 이름)
 
 11. Recap
+    learned about Templates
+    partials
+    conditionals
+    iterations
+    mixins
