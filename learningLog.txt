@@ -364,7 +364,3 @@
 27. Search 2
 
 28. Conclusions
-
-
-
-check git commit
