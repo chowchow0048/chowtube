@@ -286,3 +286,81 @@
     conditionals
     iterations
     mixins
+
+<MongoDB and Mongoose>
+1. Array DB 1
+    pug에서도 `${}` 의 포멧 지정형식 출력을 사용할 수 있다
+    `asdf ${video}` == "asdf" + video , 같은거래
+
+2. ArrayDB 2
+    절대경로 absoluteURL: "/profile/edit-profile/password" >> /가 맨앞에 있으면 root에 URL을 붙인 경로로 간다
+                >> "localhost:4000/profile/edit-profile/password"
+    상대경로 relativeURL: "potato" >> /가 맨앞에 없으면 현재 경로에서 마지막 부분을 바꾼 경로로 들어간다
+                >> "localhost:4000/profile/edit-profile/password" 에서 "potato"로 가는 URL을 타면
+                >> "localhost:4000/profile/edit-profile/potato" 로 간다
+    삼항연산자 Ternary operator, html도 삼항연산자를 쓸 수 있는듯
+    ex) h3 #{video.views} #{video.views === 1 ? "view":"views"}
+                            video.view의 값이 1이면 "view"가 되고, 
+                            video.view의 값이 1이 아니면 "views"가 된다
+3. Edit video 1
+    get, post
+    videoRouter.get("/asdf", controller)
+    videoRouter.post("/asdf", contorller) >> 서버가 post를 이해할 수 있게됐다
+    get과 post의 차이
+    사용 목적: get은 서버의 리소스에서 data를 요청할 때
+            post는 서버의 리소스를 새로 생성하거나 업데이트할 때 사용
+            get은 DB로 따지면 SELECT에 가깝고, POST는 CREATE에 가깝다
+
+4. Edit video 2
+    get으로 데이터를 요청하고, post로 데이터를 수정, 추가, 삭제 한다
+    app.use(express.urlencoded({extended: true}));
+    form - input - submit - post request - post controller - req.body 
+    순서대로 진행됨. post controller에서  post request를 통해 얻은 req.body 데이터를 처리하게됨
+
+5. Recap
+
+6. More Practice 1
+
+7. More Practice 2
+
+8. introduction to MongoDB
+
+9. Connectinc to MongoDB
+
+10. CRUD introduction
+
+11. Video Model
+
+12. Our First Query 2
+
+13. Async Await
+
+14. Returns and Renders
+
+15. Creating a Video 1
+
+16. Cfeating a Video 2
+
+17. Ecexptions and Validation
+
+18. More Schema
+
+19. Video Detail
+
+20. Edit video 1
+
+21. Edit video 2
+
+22. Edit video 3
+
+23. Middlewares
+
+24. Statics
+
+25. Delete video
+
+26. Search 1
+
+27. Search 2
+
+28. Conclusions

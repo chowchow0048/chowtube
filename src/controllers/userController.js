@@ -1,6 +1,9 @@
-export const join = (req, res) => res.send("Join");
-export const edit = (req, res) => res.send("Edit");
-export const remove = (req, res) => res.send("Remove User");
-export const login = (req, res) => res.send("Login");
+const fakeUser = {
+    userName: "Tom",
+    userAge: "24",
+    userSex: "Male",
+}
+
 export const seeUser = (req, res) => res.send("See User Profile");
-export const logout = (req, res) => res.send("Log Out")
+
+export const userHome = (req, res) => res.render("userHome", {pageTitle: `${fakeUser.userName}`, fakeUser});
