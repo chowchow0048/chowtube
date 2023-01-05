@@ -320,12 +320,49 @@
 5. Recap
 
 6. More Practice 1
+    recap 강의.
+    controller - route - template
+    controller: (req,res) => {res.render(template, {pageTitle: "Upload Video})};
+    route: .route(path).get(controller).post(controller);
+    template: extend base, block content form(method="POST")
+                                            input(placeholder="Title", required, type="text")
+                                            input(type="submit", value="Upload Video")
+
 
 7. More Practice 2
+    recap 강의
+    videos 배열에 newVideo를 push
+    form(method="POST", action="/videos/upload")
+        input(name="title", placeholder="Title", required, type="text")
+        input(type="submit", value="Upload Video")
+    title 입력하고 submit버튼 누르면
+    postUpload controller에 의해
+    const newVideo = {title, rating, comment, ... };
+    videos.push(newVideo);
+    res.redirect("/");
 
 8. introduction to MongoDB
+    mongodb 설치 homebrew로 설치함
 
 9. Connectinc to MongoDB
+    mongod -> mongosh : mongoDB쓰는 mongo shell로 연결
+    show dbs, show users등 커맨드 수행 가능
+    
+    1. import mongoose from "mongoose";
+    2. mongoose.set('strictQuery', true);
+    3. mongoose.connect("mongodb://127.0.0.1:27017/chowtube", {
+        useNewUrlParser: true,
+        useUnifiedTopolgy: true
+    });
+    4. const db = mongoose.connection;
+    5. db.on("error", handleError);
+    6. db.once("open", handleOpen);
+
+    db.on은 조건만족시 마다 지정한 controller 수행
+    db.once는 조건만족시 한번 지정한 controller 수행
+
+    위에 만들어준 db.js파일을 server와 연결하는법
+    1. server.js에서 import './db';
 
 10. CRUD introduction
 
