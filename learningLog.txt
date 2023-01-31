@@ -363,26 +363,160 @@
 
     위에 만들어준 db.js파일을 server와 연결하는법
     1. server.js에서 import './db';
+    2. 끝
 
 10. CRUD introduction
+    Create Read Upload Delete, CRUD
+    module: DB에게 어떤 형태의 data를 줄것이라 알려주는 형식을가진 파일
 
 11. Video Model
+    shape of the data: Schema, via schema we make model
+    const videoSchema = new mongoose.Schema({});
+    const movieModel = mongoose.model("name", videoSchema);
 
-12. Our First Query 2
+    db를 mongoose와 연결시켜서 video model을 인식시킨다
+
+12. Our First Query 
+    server.js에서 app.listen()으로 서버를 작동하는 부분을 init.js로 분할
+    db와 mongoose의 소통을 위해 만든 model을 사용하는 방법에는 두가지가 있다
+    1. callback
+        js에서 기다림을 표현하는 방법중 하나, 연결이 확인되면 특정 function이 발동하는 app.listen같은것
+        configuration과 functio이 필요함
+    2. promise
+
+    기본적인 model.find()의 형식: model.find({찾을 data 형식}, callback);
+
+13. Our First Query 2
+    model.find()는 server밖에있는 db속에서 data를 찾는것이기 때문에 시간이 더 걸림
+    그래서 다른 작업에 비해 늦게 끝남
+    callback: 파라미터로 전달받은 함수, 
 
 13. Async Await
+    callback function 의 장점은 에러들을 바로 볼 수 있다는것
+    하지만 js의 단점은 기다리는 기능이 없어서 아무리 위에서 아래로 읽어도 database에서 불러오는 시간이 있어서 순서가 꼬인다 그래서 callback function을 썼었다.
+    하지만 await,async가 생기면서 달라졌다!!
+    await는 database에게 결과값을 받을때까지 js가 기다리게 해줄 수 있다..!!
+    await,async의 장점은 매우 직관점이라는것 즉 js 가 어디서 어떻게 기다리는지 알 수 있다
+    await는 규칙상 function이 async 상태일때만 안에서 사용 가능!
+    하지만 callback function과 달리 promise방식은 error 가 어디서 오는지 명확하지가 않다
+    그래서 try catch 방법을 쓴다
+    말그대로 try 안에 있는 코드를 실행해보고 오류가 생기면 catch 안에 코드가 실행되는구조
+
+    핵심 코드
+    video.find({}, (error, videos) => {
+        if(error){
+            return res.render("server-error")
+        }
+        return res.render("home")
+    });
 
 14. Returns and Renders
+    1. return의 역할 : 본질적인 return의 역할보다는 function을 마무리짓는 역할로 사용되고 있음.
+    - 이러한 경우 return이 없어도 정상적으로 동작하지만 실수를 방지하기 위해 return을 사용
+    2. render한 것은 다시 render할 수 없음
+    - redirect(), sendStatus(), end() 등등 포함 (express에서 오류 발생)
+
+    C#에서 async 와 await를 생각 하시면 쉬울듯 합니다.
+    비동기를 동기적으로 동작하는 것 처럼 보여주는게 아니고
+    저 코드 자체가 비동기 동작 코드 입니다.
+    async는 "애들아 이 함수에는 뭔가 약간 구린 코드가 있어
+    그러니까 일단 내 볼일 볼때까지 그냥 니들일은 알아서들
+    하고 있엉~~"
+    await는 "ㅋㅋㅋ 내가 바로 그 구린녀석이다. 나도 내할일 하고
+    나서 결과 줄테니까 다른 넘들은 다 각자 할일 하고 있고
+    단 내뒤에 있는 넘들은(비동기 함수내에 있는 내뒤에 코드들임, 다른 함수들은 뒤에 있어도 비동기기 때문에 이미 실행됨) 일단 대기타라."
+    이렇게 이해 하시면 쉬울듯 합니다.
+    애초에 Nodejs는 내부 구조가 이렇게 되어 있어서, 그런 구조로 프로그래밍 할일은 없지만, 유저 한명이 100000기가바이트짜리
+    데이터를 불러 온다고 해도, 그 뒤에 유저들이 다 "멍~~~" 하는게
+    아니라, 저 유저의 데이터 처리는 뒤에서 따로 하고 나머지는
+    비동기로 싹 처리해 줍니다. 즉 싱글 쓰레드지만, 순식간에
+    번갈아 가면서 처리하면서 왔다리 갔다리 하기 때문에
+    우리는 잘 못느낌니다.
+    다만, 첫번째 유저가 쓰레드 자체를 혼자 완전히 독차지할
+    때보다는 불러오는 속도는 느리겠지요,
 
 15. Creating a Video 1
+    video를 만들기 위해선 document를 만들어줘야함, document는 데이터를 가진 비디오라고 생각
+    JS문법: split
+        "abc, def, jpg".split(',') >>> ['abc', 'def', 'jpg']
+        "abc, def, jpg".split(',').map((word) => `#${word}`) >>> ['#abc', '#def', '#jpg']
 
-16. Cfeating a Video 2
+    const video = new Video({
+        title,
+        description,
+        createdAt: Date.now(),
+        hashtags: hashtags.split(",").map((word)=>`#${word}`),
+        meta:{
+            views: 0,
+            rating: 0
+        }
+    })
+
+    위의 video 도큐먼트는 module로 만들어둔 mongoDB의 Video schema를 따라서 만드는거임
+
+16. Creating a Video 2
+    mongoose는 데이터 타입의 유효성을 검사한다
+    schema에 설정한 데이터 타입과 다른 타입의 데이터가 도큐먼트에 들어왔을 때,
+    그 데이터는 mongoose에 의해 유실된다
+        - 설정해둔 데이터보다 더 많은 종류의 데이터가 들어오면? 그럴경우가 있나?
+    
+    video.save(): promise를 return한다, save는 mongoose의 함수이다
+        promise를 return한다는 말은, save작업이 끝날 때까지 기다려줘야 한다는 것
+        async, await를 사용하여 save 작업을 수행하는 시간을 준다
+
+    이후 데이터를 입력하고 submit하면 home화면에 만든 video 데이터가 출력된다
+    schema 작성 - controller 생성(postUpload: model.save(), home: model.find()) - route(path)생성 - template 생성(도큐먼트를 나타낼 template)
+
+    video 도큐먼트를 만드는 또다른 방법)
+    Video.create({
+        title,
+        description,
+        createdAt: Date.now(),
+        hashtags: hashtags.split(",").map((word) => `#${word}`),
+        meta:{
+            views: 0,
+            rating: 0,
+        },
+    });
+    >>> model.create() (mongoose 문법임)
 
 17. Ecexptions and Validation
+    validation error: schema와 다른 타입의 데이터를 도큐먼트에 입력했을 때 발생, required인 데이터타입에 한하여 유효성 검사
+    data1: { type: String, reqires: true }, >>> data1은 String타입이고 required이므로 String이 아니거나, 입력되지않으면 error를 return
 
-18. More Schema
+    try{
+        Video.create({
+            ~~
+        })
+    }catch(error){
+        res.render("upload",{
+            pageTitle: "Upload",
+            errorMessage: error._message,
+        });
+    }
+    >>> await되는 코드에 오류가 있다면 JS는 더 이상 코드를 실행시키지 않는다. 그렇기에 try를 넣어서 코드가 멈추는것을 막는다
+
+18. More Schemas
+    "h e l l o       .".trim() >>> "hello."
+    이 기능을 schema에서도 적용시킬수 있다
+    maxLength: 140 >>> 문자열 최대길이 140자(char)
+    minLength: 20 >>> 문자열 최소길이 20자(char)
 
 19. Video Detail
+    mongoose의 id는 ObjectId로 검색하면 찾을 수 있음
+    ObjectId는 16진수 24개로 구성되어있음.
+    정규표현식을 통해 URL에서 ObjectId만 따로 빼올 수 있음
+    [0-9a-f]{24} >>> ("/:id([0-9a-f]{24})")
+    
+    const {id} : 변수 밖에 {}로 감싸는건 객체 구조 분해법 이다
+    var o = {p: 42, q: true}
+    var {p, q} = o;
+    console.log(p) >>> 42
+    console.log(q) >>> true
+
+    mongoDB에서 model은 다양한 함수를 제공한다
+    model.find()도 다양한 변주가 있는데
+    그중 model.findById()는 mongoDB가 주는 id값을 기반으로 도큐먼트를 찾는다
 
 20. Edit video 1
 
