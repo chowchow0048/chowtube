@@ -539,16 +539,76 @@
 22. Edit video 3
     Model.findByIdAndUpdate(): id로 도큐먼트 찾고 업데이트까지
     Model.exists({조건}): db에 있는 도큐먼트 중 조건에 맞는 도큐먼트를 반환
-    
+
 
 23. Middlewares
+    Middleware
+    미들웨어(pre또는 post훅이라고도 불림)는 비동기 함수를 실행하는 동안 제어가 전달되는 함수입니다.
+    몽구스는 document middleware, model middleware, aggregate middleware, query middleware 4가지 미들웨어가 있습니다.
+
+    model middleware가 지원하는 기능
+    document middleware함수에서 this는 현재 document를 참조합니다. https://mongoosejs.com/docs/middleware.html#types-of-middleware
+
+    데이터베이스에 전체 비디오 삭제 (2021.10.08 기준)
+    db.videos.remove({})가 deprecated됐다고 뜨시는 분들은
+    db.videos.deleteMany({})로 전체 비디오를 삭제하시면 됩니다.
+
+    schema.pre(): 'save' 하기 전에 작동하는 middleware
+    >>> schema.pre('save', function() {
+        ...
+    });
+    주의! pre안에 콜백함수로 화살표 함수 쓰게 되면 this의 대상이 달라지기 때문에 function(){}으로 써야합니다.
+    pre("save", async () => {}); (X)
 
 24. Statics
+    static은 model에 function을 추가하는 것이다. 정확히는 schema에 추가한다
+
+    modelSchema.static("funcName", function(parameter) {
+        어쩌구 저쩌구
+
+        return 저쩌구
+    })
+    이러면 model에서 함수를 만들어 export하는것과 같은 효과를 낸다. 사용법은 model.funcName(parameter) (위에서 만든 이름과 파라미터)
  
 25. Delete video
+    비디오 삭제 만들기
+    1. template 수정 : watch에서 delete 앵커 만들기
+    2. 라우터 설정
+    3. 컨트롤러 생성
+
+    findByIdAndDelete(): Id대로 도큐먼트 찾아서 삭제, findByIdAndRemove와 다른점은, remove는 되돌릴 수 없고 delete는 되돌릴 수 있다 정도
+    웬만하면 delete를 쓰도록 하자
 
 26. Search 1
+    model.find({}).sort({}): 모델의 특정 key값을 토대로 도큐먼트들을 정렬시킬수 있다,
+    강의에서는 .sort({createdAt: "desc"})를 통해 내림차순(최신순, descending)을 하였다
+
+    search page만들기
+    search는 사용자가 원하는 웹페이지를 가져다 준다(GET)
+    controller - route - template
+    controller에서 사용자가 보낸 query를 통해 페이지를 가져다 줄 예정
+    >>> const {keyword} = req.query: req.query는 form(GET)을 통해 받은 query 정보를 담고있다, 이를통해 URL에 담고있는 정보를 확인할 수 있다
 
 27. Search 2
+    mongoDB에서 정규표현식을 사용할 수 있다
+    model.find({
+        key: {
+            $regex: new RegExp(variable, ?)
+        }
+    })
+    
+    RegExp 사용 방법
+    RegExp 객체는 리터럴 표기법과 생성자로써 생성할 수 있습니다.
+    리터럴 표기법의 매개변수는 두 빗금으로 감싸야 하며 따옴표를 사용하지 않습니다.
+    생성자 함수의 매개변수는 빗금으로 감싸지 않으나 따옴표를 사용합니다.
+
+    /ab+c/i 를 아래 RegExp 생성자를 이용해서 만들 수 있습니다.
+    new RegExp(/ab+c/, 'i') // 리터럴 표기법
+    new RegExp('ab+c', 'i') // 생성자 함수
+
+    $regex 참고: https://docs.mongodb.com/manual/reference/operator/query/regex
+    RegExp 참고: https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/RegExp
+
+
 
 28. Conclusions

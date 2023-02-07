@@ -4,4 +4,6 @@ block content
     div
         p=video.description
         small=video.createdAt
-    a(href=`${video.id}/edit`) Edit
+    a(href=`${video.id}/edit`) Edit &rarr;
+    br
+    a(href=`${video.id}/delete`) Delete &rarr;
