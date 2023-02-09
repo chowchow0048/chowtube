@@ -675,12 +675,59 @@
     이건 어떻게 해결할라나?
 
 4. Form Validation
+    $or 연산자 (mongoDB)
+    : $or 연산자는 둘 이상의 조건에 대해 논리적 OR연산을 수행하고 조건 중 하나 이상을 충족하는 도큐먼트를 선택한다
+
+    강의에서 사용한 예시
+    >> const exists = User.exists({ $or: [{username}, {email}]});
+       if(exitxs){
+           return res.render("join", {
+               pageTitle,
+               erroreMessage: "same username/email",
+           });
+       }
 
 5. Status codes
+    username/email 에러 혹은 password confirmation 에러가 일어났을 때도 브라우저는 status code: 200을 받기 때문에
+    에러가 일어났다고 인식을 하지 않고, body에 있는 데이터를 저장하겠느냐고 물어봄. 이를 방지하기 위해 status code를 의도적으로 바꿔줘야함
+
+    방법: res.status(400).render(~);
+    2로 시작하는 status code들은 다 OK같은 연결에 문제가 없다는거임
+    4로 시작하는 status code들은 다 연결 실패임
+    res랑 render사이에 status()를 집어넣어주면 status code를 바꿔줄 수 있음
 
 6. Login 1
+    로그인 페이지 만들기 1
+    check if account exists
+
+    username, password, login form 필요
+    입력받은 username이 존재하지 않으면 error 발생
+    >>  const {username, password} = req.body;
+        const exists = await User.exists({username});
+        if(!exists){
+            return res.status(400).render("login",{
+
+            })
+        }
 
 7. Login 2
+    로그인 페이지 만들기 2
+    check if password is correct
+
+    password는 hashing된 상태로 저장되어있음.
+    hashing은 deterministic function이기 때문에, 입력값마다 정해진 출력값이 있음
+    따라서 입력된 password의 hash값이 저장된 password의 hash값과 같다면 password를 정확하게 입력한것임
+    >> 입력된 password의 hash값과 저장된 password의 hash값의 비교(compare)가 필요하다
+    >>> bcrypt.compare()
+
+    const user = await User.exists({username});
+    const ok = await bcrypt.compare(password, user.password);
+    if(!ok){
+        return res.status(400).render("login",
+        pageTitle,
+        errorMessage: "Wrong password."
+        });
+    }
 
 8. Sessions and Cookies 1
 
