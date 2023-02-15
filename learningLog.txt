@@ -730,26 +730,190 @@
     }
 
 8. Sessions and Cookies 1
+    유저를 기억하는 방법 중 한가지: 유저에게 쿠키를 주는것
+    쿠키를 이해하기 위해선 세션을 알아야한다
+    세션: 백엔드와 브라우저 간에 어떤 활동을 했는지 기억하는 것, 2주 정도의 lifetime을 갖는다
+        세션이 작동하려면 백엔드와 브라우저가 서로에 대한 정보를 가지고 있어야함
+    
+    서버와 백엔드는 지속적인 연결을 하고 있지않음, stateless: 한번 연결하고 끝, 이게 서버와 백엔드의 연결상태임
+
+    세션은 id같은것, 서버는 세션을 통해 백엔드를 기억하고, 쿠키는 이 세션을 담고있다
+    세션은 서버측에서 제공해주는 데이터, 쿠키는 클라이언트측에서 저장하고 사용하는 데이터
+    req.sessiontStore() 사용했을때 한번은 undefined가 나온 이유가 세션은 서버에서 만들어줘야 하는데 클라이언트가 첫 요청때 세션을
+    가지고있을리 없으니 undefined이 나온거고 그 이후 요청부턴 첫번째 요청때 세션을 만들어서 넘겨줬으니 클라이언트가 해당 값을 쿠키에 저장하고 매 요청때마다 서버에게 전달
+    세션은 서버가 만들어서 제공해주다보니 서버가 재부팅되면 초기화 된다. (그래서 DB에 저장해서 관리를 한다는 소리. 실 운영에선 서버가 꺼지는 일은 없으니깐.)
+    세션의 값은 서버가 만들어주는 고유값이다보니 해당 값을 기준으로 클라이언트에서 요청한 건에 대해 유저를 특정지을 수 있다
 
 9. Sessions and Cookies 2
+    브라우저에서 웹사이트를 방문할 때마다 session middleware가 있으면
+    experss가 알아서 그 브라우저를 위한 session id를 만들어주고 브라우저한테 보내준다
+    그러면 브라우저가 쿠키에 그 session id를 저장하고
+    express에서도 그 session을 session DB에 저장한다(session DB에 있는 id와 쿠키에 있는 id가 같도록)
+    그러면 백엔드에서 어떤 유저가 어떤 브라우저에서 요청을 보냈는지 알 수 있게된다.
+    >> 회사에서 사원에게 id카드를 발급하는것과 같음
 
 10. logged in User 1
+    서버 == 1초마다 까먹는 사람
+
+    base.pug에서)
+    if !req.session.loggedIn
+        li
+            a(href="/join") Join
+        li
+            a(href="/login") Login
+    >> 에러뜬다, pug는 req.session을 이해하지 못한다
 
 11. logged in User 2
+    pug는 express의 res.locals를 접근할 수 있음,
+    pug template에서 res.locals안에 있는 멤버를 바로 사용할 수 있다는 뜻임.
+    res.locals.sexy = "you" 라는 멤버가 있다면
+    pug template에서
+    h1=res.locals.sexy ("you") 이렇게 사용할 수 있음
+
+    res.locals는 request범위가 지정된 response 로컬 변수를 포함하는 객체이므로
+    request, response  주기동안 렌더링된 view에서만 사용가능합니다
+    (Pug나 EJS같은 템플릿 엔진에서 사용 가능하다는 의미)
+    이 속성은 request path, 인증된 사용자, 사용자 설정 등과 같은 request level의 정보를 노출하는 데 유용합니다.
+    ```
+    // 사용 예시
+    app.use(function (req, res, next) {
+    res.locals.user = req.user
+    res.locals.authenticated = !req.user.anonymous
+    next()
+    })
+    ```
+    https://expressjs.com/ko/api.html#res.locals
 
 12. Recap
+    1. localsMiddleware
+        express-session을 통해 만든 middleware.
+        브라우저가 우리의 백엔드와 상호작용할 때 마다 session 이라는 middleware가 브라우저에 쿠키를 전송한다
+        쿠키: 백엔드가 사용자의 브라우저에게 주는 정보, 쿠키에는 정해진 규칙이 있기 때문에 매번 백엔드에 request를 할 때,
+            브라우저가 알아서 그 request에 쿠키를 붙인다
+        
+    2. http는 stateless이다.
+        connection이 계속 유지되지 않는다.
+        connection은 render가 끝나거나 redirect가 발생하거나 POST request를 보내거나 404를 받으면 끝난다
+        그래서 사용자에게 session ID를 주는것, session ID는 쿠키안에 있음
+
+    3. 쿠키와 세션은 다른것
+        쿠키는 정보를 주고받는 방법
+        세션은 쿠키에 저장되는 정보
+        세션은 쿠키안에 저장되고 백엔드에도 저장된다, 백엔드는 생성된 모든 세션id를 관리한다        
 
 13. MongoStore
+    session ID는 초기상태에서는 서버의 메모리에 저장되는데, 서버의 메모리는 서버를 다시 킬 때 마다 초기화 되기 때문에 다른 저장소를 설정해야한다
+    우리는 mongodb에 session들을 저장해놓을 것이므로, MongoSotre를 사용할 것이다
+
+    MongoStore 적용방법)
+    1. connect-mongo 설치: npm i connect-mongo
+    2. server.js에 MongoStore import: import MongoStore from 'connect-mongo';
+    3. session middleware에 store 옵션 세팅하기
+        app.use(session ({
+            secret: "!@#23",
+            resave: true,
+            saveUninitialized: true,
+            store: MongoStore.create({ mongoUrl: "mongodb의 url" }),
+        }));
 
 14. Uninitialized Sessions
+    Uninitialized는 modify되지 않은 session을 말한다, 생성되고 변화가 없는, 건드린적이 없는 session들을 Uninitialized라고 부른다.
+    홉페이지에 접속하는 모든 유저들, 로그인하지 않은 유저들 까지도 쿠키를 주면 DB의 용량이 매우 거대해지고 비용이 많이 들기 때문에, 로그인한 유저에게만 쿠키를
+    주는 방식이 훨씬 효율적이다.
+    로그인한 유저에게만 쿠키를 주기위해서 session의 Uninitialized, resave 옵션 두개를 false로 설정한다
+    app.use(session({
+        secret: "1232",
+        resave: false,
+        Uninitialized: false,
+        store: MongoStore.create({ mongoUrl: "mongoUrl" }),
+    }));
 
 15. Expiration and Secrets
+    secret: session은 보호받아야한다. session hijack이라는 해킹 기법을 통해 다른 유저가 어떤 유저인 척 할수 있기때문이다.
+    domain: 쿠키를 만든 backend가 누구인지 알려주는 항목, 브라우저는 도메인에 따라 쿠키를 저장하게 되어있다.
+            우리가 어떤 요청을 하던간에 쿠키가 도메인의 백엔드로 가게 되어있다.
+    expires: 세션의 만료날짜. 만료날짜를 지정하지 않은 세션은 session cookie로 설정되고, 사용자가 닫으면 session cookie는 삭제된다.
+             사용자가 홈페이지를 닫지않는이상 죽지않게된다.
+    max-age: 세션의 유통기한. 사용자가 계속 접속을 유지하고있어도 max-age에 설정된 시간을 넘어가면 자동으로 세션이 만료된다.
+        max-age설정 방법)
+            app.use(session({
+                secret:"123123",
+                resave: false,
+                uninitialized: false,
+                cookie: {
+                    maxAge: 203120302 (1/1000의 millisecond로 치환될거임)
+                },
+                store: MongoStore.create({ mongoUrl: "mongoUrl" }),
+            }));
+
+    secret과 db_url을 보호하자)
+    1. src밖의 폴더에 .env파일을 만든다
+    2. .gitignore에 보호할 변수를 만든다
+        COOKIE_SECRET=1241t424@$3rgare
+        DB_URL=mongodb의 url
+    3. secret과 db_url을 .env의 변수들로 대체한다
+        app.use(session({
+            secret: process.env.COOKIE_SECRET,
+            resave: false,
+            Uninitialized: false,
+            cookie: {
+                maxAge: 2000000,
+            }
+            store: MongoStore.create({ mongoUrl: process.env.DB_URL }),
+        }))
 
 16. Environment Variables
+    dotenv를 통해 .env에 선언한 환경변수들을 사용할 수 있다
+    1. npm i dotenv
+    2. 환경변수를 사용하는 소스파일 모두에서 require("dotenv").config(); >>> 번거로움
+        require("dotenv").config() 가장 먼저 처리해줘야함
+    3. init.js에서 import "dotenv/config" >>> 
+    끝!
 
 17. Github Login 1
+    github 연동 로그인 과정
+    1. users are redirected to request their GitHub identity
+    2. Users are redirected back to your site by GitHub
+    3. Your app accesses the API with the user's access token
+
+    https://github.com/settings/apps >> OAuth Apps >> New OAuth App >> 세팅 후 Register application
+    를 하면 OAuth application settings 화면으로 이동함.
+    여기서 중요한건 Client Id임, 이걸로 연동로그인 페이지로 접근할 수 있게함.
+
+    login.pug에서 (view)
+    a(href="https://github.com/login/oauth/authorize") Continue with GitHub &rarr;
+    만들고, url에 ?client_id=OAuth application settings 페이지에 있는 client id를 복사붙여넣기 하면 됨
+
+    scope: 아무 설정없이 연동로그인 app을 세팅하면 public data만 받을 수 있음, 원하는 정보를 어디까지 가져올지 범위를 설정하는 요소
+    allow_signup: true로 설정하면 github아이디가 없는사람은 이 페이지에서 github에 join할 수 있게함, false로 설정하면
+                이미 github아이디가 있는 사람만 연동로그인 가능
 
 18. Github login 2
+    상대경로, 에러발생
+    >> "github/start" == "http://localhost:4000/users/github/start" 
+    절대경로, 성공
+    >> "/github/start" == "https://github.com/login/oauth/authorize?client_id=e0a3133ec926abb54066&allow_signup=false&scope=read%3Auser+user%3Aemail"
+
+    view에 있는 a(href="githubLoginURL")에서 githubLoginURL의 길이가 위에처럼 너무 기니까 따로 만들어주자
+    1. a 태그 변경
+        a(href="/users/github/start")
+    2. route
+        userRouter에서
+        userRouter.get("/github/start", startGithubLogin);
+    3. controller
+        userController에서
+        export const startGithubLogin = (req, res) => {
+            const baseUrl = "https://github.com/login/oauth/authorize";
+            const config = {
+                client_id: github 연동로그인 세팅 하고 받은 client id(string으로),
+                allow_signup: false,
+                scope: "read:user user:email",
+            };
+            const params = new URLSearchParams(config).toString();
+            const finalUrl = `${baseUrl}?${params}`;
+
+            return res.render(1)
+        }
 
 19. Github login 3
 

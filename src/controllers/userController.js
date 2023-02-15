@@ -56,9 +56,37 @@ export const postLogin = async (req, res) => {
             errorMessage: "Wrong password."
         });
     }
-    console.log("USER IN");
+
+    req.session.loggedIn = true;
+    req.session.user = user;
+
     res.redirect("/");
 }
+
+export const getLogOut = (req, res) => {
+    // 로그아웃
+    // session 삭제
+    // 홈화면으로 redirect
+    res.redirect('/');
+}
+
+export const startGithubLogin = (req, res) => {
+    const baseUrl = "https://github.com/login/oauth/authorize";
+    const config = {
+        client_id: "e0a3133ec926abb54066",
+        allow_signup: false,
+        scope:"read:user user:email",
+    };
+    const params = new URLSearchParams(config).toString();
+    const finalUrl = `${baseUrl}?${params}`;
+
+    return res.redirect(finalUrl);
+}
+
+export const finishGithubLogin = (req, res) => {
+    
+}
+
 
 export const userHome = (req, res) => res.send("userHome");
 
