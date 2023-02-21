@@ -916,12 +916,62 @@
         }
 
 19. Github login 3
+    Users are redirected back to your site by GitHub
+    사용자가 요청을 수락하면 GitHub은 코드 매개변수의 임시 code와 상태 매개변수의 이전 단계에서
+    제공한 state를 사용하여 사이트로 다시 redirect한다
+        1. OAuth 로그인 실행 후, 사용자에게 필요한 정보제공 동의를 묻는다
+        2. 사용자가 정보제공 동의를 수락(요청을 수락)하면 Github이 임시code를 주면서(10분의 lifetime) 사이트로 redirect
+        3. POST 를 보낸다 (강의에서는 POST대신 fetch사용), POST request를 할 때, 반드시 필요한 파라미터들은
+            client_id, client_secret, code
+
+    fetch)
+        1. fetch('url')로 다른 서버를 통해 데이터를 가져올 수있다.
+        하지만, res.body 에 담겨있는 날것의 url로는 제대로 된 객체를 받아올 수 없다.
+
+        2.때문에 중간에 .json 함수가 response의 스트림을 가져와 끝까지 읽고, res.body의 텍스트를 promise의 형태로 반환한다.
+
+        3. 다른 서버에서 데이터를 object 형식으로 받아온다.
+
 
 20. Github login 4
+    굉장히 어려운 부분, await이 중첩되는것도 어렵고, fetch가 나를 조져놓고있다
+    const tokenRequest = await (
+        await fetch(finalUrl, {
+            method: "POST",
+            headers:{
+                Accept: "application/json",
+            },
+        })
+    ).json();
+    >> tokenRequest는 finalUrl에 POST방식으로 fetch해온걸 json으로 번역한것 같다
+        header는 클라이언트와 서버가 request(or response)로 부가적인 정보를 전송할 수 있도록 해준다
+        Accpet는 돌려줄 데이터 타입에 대해 서버에게 알려주는 역할을 한다, 즉 tokenRequest는 POST방식으로 데이터를 보내주는데 그 데이터 타입이 application/json이라는 것
+    
+    if("access_token" in tokenRequest){
+        const {access_token} = tokenRequest;
+        const userRequest = await (
+            await fetch(("https://api.github.com/user"), {
+                headers: {
+                    Authorization: `token ${access_token}`
+                },
+            })
+        ).json();
+        console.log(userRequest);
+    }else{
+        return res.redirect("/login");
+    }
+
+    >>tokenRequest에 "access_token"이 있다면, userRequest는 github api주소로 부터 정보를 fetch 해온다
 
 21. Github login 5
+    startGithubLogin에서 access_token의 scope를 {read:user, user:email}로 정해놓았기 때문에
+    우리가 github으로부터 받은 access_token은 user의 data와 user의 email data를 볼 수 있게해준다
+    
+    emailData에는 user:email에 해당하는 정보가 들어있다. 우리는 이중 {primary: true, verified: true}인 email을 원한다
+    >> const emailObj = emailData.find({ (email) => email.primary === true && email.verified === true });
 
 22. Github login 6
+    emailObj을 찾으면({primary: true, verified: true}인 email),  
 
 23. Log out
 
